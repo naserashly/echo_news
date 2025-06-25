@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <!-- تم الإصلاح: تغيير type إلى النوع الصحيح لملفات PNG -->
+    <link rel="icon" href="https://cdn-icons-png.freepik.com/512/7108/7108096.png" type="image/png">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo News </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- General Styles --- */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #f8f9fa;
+            --dark-color: #343a40;
+            --light-color: #ffffff;
+            --warning-color: #ffc107;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--light-color);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-weight: 800;
+        }
+
+        /* --- Articles Grid --- */
+        #articles-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .article-card {
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .article-card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #e9ecef;
+        }
+
+        .article-card-content {
+            padding: 15px;
+            flex-grow: 1;
+        }
+
+        .article-card-title {
+            margin: 0 0 10px 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .article-card-meta {
+            font-size: 0.8rem;
+            color: #6c757d;
+            padding: 0 15px 15px 15px;
+            margin-top: auto;
+        }
+
+        /* --- Floating Add Button (+) --- */
+        #add-post-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            border: none;
+            border-radius: 50%;
+            font-size: 36px;
+            line-height: 60px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+
+        #add-post-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- Modals --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--light-color);
+            margin: auto;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: fadeIn 0.3s;
+        }
+        
+        /* إضافة: نافذة أصغر لإضافة الصور داخل المقال */
+        .modal-content.small-modal {
+            max-width: 450px;
+        }
+
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* --- Forms --- */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        form h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        input[type="text"], input[type="email"], input[type="url"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        button[type="submit"], .modal-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        button#submit-edit-btn {
+            background-color: var(--success-color);
+        }
+
+        button[type="submit"]:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        /* إضافة: زر حذف المقال */
+        #delete-article-btn {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        #delete-article-btn:hover {
+            opacity: 0.9;
+        }
+
+
+        /* --- Single Article View --- */
+        #article-view-content {
+            padding: 20px;
+        }
+        
+        #article-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+        }
+
+        #article-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        
+        #article-media-container {
+            margin-bottom: 20px;
+        }
+
+        #article-image, #article-video {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            display: block;
+            margin: 0 auto 15px auto;
+        }
+        
+        #article-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word; /* لضمان عدم خروج النص عن الحاوية */
+        }
+        
+        /* إضافة: لتنسيق الصور داخل المقال */
+        #article-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            display: block;
+            margin: 15px auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        #edit-article-container, #delete-article-container {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px dashed #ccc;
+            text-align: center;
+        }
+        .edit-article-btn {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+            padding: 10px 25px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .edit-article-btn:hover {
+            opacity: 0.9;
+        }
+        
+        /* --- Comments Section --- */
+        #comments-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        #comments-section h3 {
+            margin-bottom: 20px;
+        }
+
+        #comments-list {
+            margin-top: 20px;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .comment-item {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .comment-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .comment-date {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .comment-text {
+             margin: 0;
+             white-space: pre-wrap;
+        }
+        
+        .delete-comment-btn {
+            background-color: transparent;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .delete-comment-btn:hover {
+            background-color: var(--danger-color);
+            color: var(--light-color);
+        }
+
+        /* Spinner for loading */
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s ease infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            background-color: var(--dark-color);
+            color: var(--light-color);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Echo News</h1>
+    </header>
+
+    <main class="container">
+        <div id="articles-container">
+            <div class="spinner"></div>
+        </div>
+    </main>
+
+    <button id="add-post-btn">+</button>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="admin-login-modal">×</span>
+            <form id="admin-login-form">
+                <h2>دخول الأدمن</h2>
+                <input type="email" id="admin-email" placeholder="البريد الإلكتروني" required>
+                <button type="submit">دخول</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel (Create Post) Modal -->
+    <div id="admin-panel-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="admin-panel-modal">×</span>
+            <form id="admin-post-form">
+                <h2>إنشاء مقالة جديدة</h2>
+                <input type="text" id="post-title" placeholder="عنوان المقالة" required>
+                <input type="text" id="post-author" placeholder="اسم الناشر" required value="فريق التحرير">
+                <textarea id="post-content" placeholder="موضوع المقالة (لإضافة صورة داخل النص اكتب #اضافه_صوره)" required></textarea>
+                <label>صورة غلاف المقال (اختر واحداً):</label>
+                <input type="file" id="post-image-upload" accept="image/*">
+                <input type="url" id="post-image-url" placeholder="أو ضع رابط صورة خارجي">
+                <label>فيديو للمقال (اختياري):</label>
+                <input type="file" id="post-video-upload" accept="video/*">
+                <input type="url" id="post-video-url" placeholder="أو ضع رابط فيديو خارجي (يوتيوب)">
+                <button type="submit" id="submit-post-btn">نشر المقالة</button>
+                <div id="upload-status"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Article Modal -->
+    <div id="edit-panel-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="edit-panel-modal">×</span>
+            <form id="edit-post-form">
+                <h2>تعديل المقالة</h2>
+                <input type="hidden" id="edit-article-id"> <!-- Hidden field to store ID -->
+                <input type="text" id="edit-post-title" placeholder="عنوان المقالة" required>
+                <input type="text" id="edit-post-author" placeholder="اسم الناشر" required>
+                <textarea id="edit-post-content" placeholder="موضوع المقالة (لإضافة صورة داخل النص اكتب #اضافه_صوره)" required></textarea>
+                <p>لتغيير الصورة أو الفيديو، أدخل رابطًا جديدًا. (لا يمكن تعديل الملفات المرفوعة حاليًا)</p>
+                <input type="url" id="edit-post-image-url" placeholder="رابط صورة خارجي">
+                <input type="url" id="edit-post-video-url" placeholder="رابط فيديو خارجي (يوتيوب)">
+                <button type="submit" id="submit-edit-btn">حفظ التعديلات</button>
+                <div id="edit-upload-status"></div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- إضافة: نافذة إضافة صورة داخلية -->
+    <div id="inline-image-modal" class="modal">
+        <div class="modal-content small-modal">
+            <span class="close-btn" data-modal-id="inline-image-modal">×</span>
+            <h2>إضافة صورة داخل المقال</h2>
+            <div id="inline-image-form">
+                <p>اختر طريقة إضافة الصورة:</p>
+                <input type="file" id="inline-image-upload" accept="image/*">
+                <p style="text-align: center; font-weight: bold; margin: 10px 0;">أو</p>
+                <input type="url" id="inline-image-url" placeholder="ضع رابط صورة خارجي">
+                <button type="button" id="add-inline-image-btn" class="modal-button" style="margin-top: 15px;">إضافة الصورة</button>
+                <div id="inline-upload-status"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Single Article View Modal -->
+    <div id="article-view-modal" class="modal">
+         <div class="modal-content">
+            <span class="close-btn" data-modal-id="article-view-modal">×</span>
+            <div id="article-view-content">
+                <div class="spinner" id="article-loader"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p> © 2025 Echo News. All rights reserved.
+
+ </p>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHVRnwislDnAbLaBXJ9u0f5lY9mJfPGXc",
+            authDomain: "echonews-4a654.firebaseapp.com",
+            projectId: "echonews-4a654",
+            storageBucket: "echonews-4a654.appspot.com",
+            messagingSenderId: "70935893816",
+            appId: "1:70935893816:web:a0c2be50284866a01893cd",
+            measurementId: "G-653ZVY5730"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        const articlesContainer = document.getElementById('articles-container');
+        const articleViewContent = document.getElementById('article-view-content');
+        const adminLoginForm = document.getElementById('admin-login-form');
+        const adminPostForm = document.getElementById('admin-post-form');
+        const editPostForm = document.getElementById('edit-post-form');
+        
+        // إضافة: عناصر نافذة الصور الداخلية
+        const postContentTextarea = document.getElementById('post-content');
+        const editContentTextarea = document.getElementById('edit-post-content');
+        let activeTextarea = null; // لتحديد أي مربع نص سيتم التعديل فيه
+
+        const ADMIN_EMAIL = "naseahmed366@gmail.com";
+        let isAdmin = false;
+
+        function showModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+        function formatFirebaseDate(firebaseTimestamp, options = { year: 'numeric', month: 'long', day: 'numeric' }) {
+            if (!firebaseTimestamp) return '';
+            return new Intl.DateTimeFormat('ar-EG', options).format(firebaseTimestamp.toDate());
+        }
+
+        document.getElementById('add-post-btn').addEventListener('click', () => {
+            if (isAdmin) showModal('admin-panel-modal');
+            else showModal('admin-login-modal');
+        });
+        
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', () => closeModal(btn.getAttribute('data-modal-id')));
+        });
+
+        window.onclick = (event) => {
+            if (event.target.classList.contains('modal')) closeModal(event.target.id);
+        };
+
+        adminLoginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            if (email.toLowerCase() === ADMIN_EMAIL) {
+                isAdmin = true;
+                sessionStorage.setItem('isAdmin', 'true'); // تخزين حالة الأدمن
+                closeModal('admin-login-modal');
+                showModal('admin-panel-modal');
+                adminLoginForm.reset();
+                loadArticles(); // إعادة تحميل المقالات لإظهار أزرار الأدمن
+            } else {
+                alert('البريد الإلكتروني غير صحيح!');
+            }
+        });
+        
+        // التحقق من حالة الأدمن عند تحميل الصفحة
+        if (sessionStorage.getItem('isAdmin') === 'true') {
+            isAdmin = true;
+        }
+
+        adminPostForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const statusDiv = document.getElementById('upload-status');
+            submitBtn.disabled = true;
+            statusDiv.textContent = 'جاري النشر...';
+
+            try {
+                let imageUrl = document.getElementById('post-image-url').value;
+                let videoUrl = document.getElementById('post-video-url').value;
+                const imageFile = document.getElementById('post-image-upload').files[0];
+                const videoFile = document.getElementById('post-video-upload').files[0];
+
+                if (imageFile) {
+                    const imageRef = ref(storage, `images/${Date.now()}-${imageFile.name}`);
+                    await uploadBytes(imageRef, imageFile);
+                    imageUrl = await getDownloadURL(imageRef);
+                }
+                
+                if (videoFile) {
+                    const videoRef = ref(storage, `videos/${Date.now()}-${videoFile.name}`);
+                    await uploadBytes(videoRef, videoFile);
+                    videoUrl = await getDownloadURL(videoRef);
+                }
+
+                await addDoc(collection(db, 'articles'), {
+                    title: document.getElementById('post-title').value,
+                    content: document.getElementById('post-content').value,
+                    author: document.getElementById('post-author').value,
+                    imageUrl: imageUrl || null,
+                    videoUrl: videoUrl || null,
+                    createdAt: serverTimestamp()
+                });
+
+                alert('تم نشر المقالة بنجاح!');
+                closeModal('admin-panel-modal');
+                adminPostForm.reset();
+                loadArticles();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert('حدث خطأ أثناء النشر.');
+            } finally {
+                submitBtn.disabled = false;
+                statusDiv.textContent = '';
+            }
+        });
+
+        async function loadArticles() {
+            articlesContainer.innerHTML = '<div class="spinner"></div>';
+            try {
+                const q = query(collection(db, 'articles'), orderBy("createdAt", "desc"));
+                const snapshot = await getDocs(q);
+                articlesContainer.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    articlesContainer.innerHTML = '<p>لا توجد مقالات لعرضها حاليًا.</p>';
+                    return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const article = docSnap.data();
+                    const card = document.createElement('div');
+                    card.className = 'article-card';
+                    card.dataset.id = docSnap.id;
+
+                    card.innerHTML = `
+                        <img src="${article.imageUrl || 'https://via.placeholder.com/400x200.png?text=خبر'}" alt="${article.title}" class="article-card-img">
+                        <div class="article-card-content">
+                            <h3 class="article-card-title">${article.title}</h3>
+                        </div>
+                        <div class="article-card-meta">
+                           <span>بواسطة: ${article.author || 'فريق التحرير'}</span> | <span>${formatFirebaseDate(article.createdAt)}</span>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => viewArticle(docSnap.id));
+                    articlesContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Error loading articles: ", error);
+                articlesContainer.innerHTML = '<p>حدث خطأ في تحميل الأخبار.</p>';
+            }
+        }
+        
+        async function viewArticle(articleId) {
+            articleViewContent.innerHTML = '<div class="spinner" id="article-loader"></div>';
+            showModal('article-view-modal');
+
+            try {
+                const docRef = doc(db, "articles", articleId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    articleViewContent.innerHTML = '<p>عذرًا، هذه المقالة غير موجودة.</p>';
+                    return;
+                }
+
+                const article = docSnap.data();
+                const fullDateOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'Africa/Cairo' };
+                
+                let mediaHTML = '';
+                if (article.imageUrl) mediaHTML += `<img id="article-image" src="${article.imageUrl}" alt="${article.title}">`;
+                if (article.videoUrl) {
+                    if(article.videoUrl.includes('youtube.com/embed')) {
+                        mediaHTML += `<div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="${article.videoUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" allowfullscreen></iframe></div>`;
+                    } else {
+                        mediaHTML += `<video id="article-video" src="${article.videoUrl}" controls></video>`;
+                    }
+                }
+
+                const updateMeta = article.updatedAt ? `<br><span style="color: var(--success-color);">آخر تحديث: ${formatFirebaseDate(article.updatedAt, fullDateOptions)}</span>` : '';
+                
+                // إضافة: منطق إظهار أزرار الأدمن
+                const editButtonContainer = isAdmin ? `<div id="edit-article-container"><button class="edit-article-btn" data-article-id="${articleId}">تعديل المقالة</button></div>` : '';
+                const deleteButtonContainer = isAdmin ? `<div id="delete-article-container"><button id="delete-article-btn" data-article-id="${articleId}">حذف المقالة</button></div>` : '';
+
+                // تعديل: فصل المحتوى عن الهيكل الرئيسي للسماح بعرض HTML
+                articleViewContent.innerHTML = `
+                    <h2 id="article-title">${article.title}</h2>
+                    <div id="article-meta">
+                        <span>نشر بواسطة: ${article.author}</span> | <span>${formatFirebaseDate(article.createdAt, fullDateOptions)}</span>
+                        ${updateMeta}
+                    </div>
+                    <div id="article-media-container">${mediaHTML}</div>
+                    <div id="article-body"></div> <!-- حاوية فارغة للمحتوى -->
+                    ${editButtonContainer}
+                    ${deleteButtonContainer} <!-- إضافة حاوية زر الحذف -->
+                    <div id="comments-section">
+                        <h3>التعليقات</h3>
+                        <form id="comment-form" data-article-id="${articleId}">
+                            <input type="text" id="commenter-name" placeholder="اسمك" required>
+                            <input type="email" id="commenter-email" placeholder="بريدك الإلكتروني (لن يظهر)" required>
+                            <textarea id="comment-text" placeholder="تعليقك" required></textarea>
+                            <button type="submit">إضافة تعليق</button>
+                        </form>
+                        <ul id="comments-list"><div class="spinner"></div></ul>
+                    </div>
+                `;
+
+                // تعديل: استخدام innerHTML لعرض الصور المضمنة
+                document.getElementById('article-body').innerHTML = article.content.replace(/\n/g, '<br>');
+
+
+                loadComments(articleId);
+
+                articleViewContent.addEventListener('click', async (e) => {
+                    if (e.target.matches('.edit-article-btn')) {
+                        openEditModal(articleId, article);
+                    }
+                    if (e.target.matches('.delete-comment-btn')) {
+                        const commentId = e.target.dataset.commentId;
+                        if (confirm('هل أنت متأكد من حذف هذا التعليق؟')) {
+                            handleDeleteComment(articleId, commentId);
+                        }
+                    }
+                    // إضافة: التعامل مع زر حذف المقال
+                    if (e.target.matches('#delete-article-btn')) {
+                        if(confirm('هل أنت متأكد من حذف هذه المقالة نهائياً؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+                            try {
+                                await deleteDoc(docRef);
+                                alert('تم حذف المقالة بنجاح.');
+                                closeModal('article-view-modal');
+                                loadArticles();
+                            } catch(error) {
+                                console.error("Error deleting article: ", error);
+                                alert('حدث خطأ أثناء حذف المقالة.');
+                            }
+                        }
+                    }
+                });
+                
+                articleViewContent.querySelector('#comment-form')?.addEventListener('submit', handleCommentSubmit);
+                
+            } catch (error) {
+                console.error("Error viewing article: ", error);
+                articleViewContent.innerHTML = '<p>حدث خطأ في تحميل المقالة.</p>';
+            }
+        }
+        
+        // إضافة: دالة فتح نافذة تعديل الصور الداخلية
+        function handleInlineImageRequest(event) {
+            const textarea = event.target;
+            if (textarea.value.includes('#اضافه_صوره')) {
+                activeTextarea = textarea; // حفظ مربع النص النشط
+                showModal('inline-image-modal');
+                // مسح الحقول عند فتح النافذة
+                document.getElementById('inline-image-upload').value = '';
+                document.getElementById('inline-image-url').value = '';
+                document.getElementById('inline-upload-status').textContent = '';
+            }
+        }
+        
+        // ربط الحدث بمربعات النص
+        postContentTextarea.addEventListener('input', handleInlineImageRequest);
+        editContentTextarea.addEventListener('input', handleInlineImageRequest);
+
+
+        // إضافة: منطق نافذة الصور الداخلية
+        document.getElementById('add-inline-image-btn').addEventListener('click', async () => {
+            if (!activeTextarea) return;
+
+            const btn = document.getElementById('add-inline-image-btn');
+            const statusDiv = document.getElementById('inline-upload-status');
+            const imageFile = document.getElementById('inline-image-upload').files[0];
+            let imageUrl = document.getElementById('inline-image-url').value;
+
+            if (!imageFile && !imageUrl) {
+                alert('يرجى رفع ملف أو إدخال رابط صورة.');
+                return;
+            }
+
+            btn.disabled = true;
+            statusDiv.textContent = 'جاري إضافة الصورة...';
+
+            try {
+                if (imageFile) {
+                    const imageRef = ref(storage, `inline-images/${Date.now()}-${imageFile.name}`);
+                    await uploadBytes(imageRef, imageFile);
+                    imageUrl = await getDownloadURL(imageRef);
+                }
+
+                // إنشاء وسم الصورة وإدراجه في مربع النص
+                const imageTag = `<img src="${imageUrl}" alt="صورة مضمنة" style="max-width:100%; display:block; margin:10px auto; border-radius: 8px;">`;
+                activeTextarea.value = activeTextarea.value.replace('#اضافه_صوره', imageTag);
+                
+                closeModal('inline-image-modal');
+
+            } catch (error) {
+                console.error("Error adding inline image:", error);
+                statusDiv.textContent = 'حدث خطأ.';
+                alert('فشل في إضافة الصورة.');
+            } finally {
+                btn.disabled = false;
+                activeTextarea = null; // إعادة تعيين مربع النص النشط
+            }
+        });
+
+
+        function openEditModal(articleId, articleData) {
+            document.getElementById('edit-article-id').value = articleId;
+            document.getElementById('edit-post-title').value = articleData.title;
+            document.getElementById('edit-post-author').value = articleData.author;
+            document.getElementById('edit-post-content').value = articleData.content;
+            document.getElementById('edit-post-image-url').value = articleData.imageUrl || '';
+            document.getElementById('edit-post-video-url').value = articleData.videoUrl || '';
+            showModal('edit-panel-modal');
+        }
+
+        editPostForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const articleId = document.getElementById('edit-article-id').value;
+            if (!articleId) return;
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const statusDiv = document.getElementById('edit-upload-status');
+            submitBtn.disabled = true;
+            statusDiv.textContent = 'جاري حفظ التعديلات...';
+
+            try {
+                await updateDoc(doc(db, 'articles', articleId), {
+                    title: document.getElementById('edit-post-title').value,
+                    author: document.getElementById('edit-post-author').value,
+                    content: document.getElementById('edit-post-content').value,
+                    imageUrl: document.getElementById('edit-post-image-url').value || null,
+                    videoUrl: document.getElementById('edit-post-video-url').value || null,
+                    updatedAt: serverTimestamp()
+                });
+
+                alert('تم تعديل المقالة بنجاح!');
+                closeModal('edit-panel-modal');
+                editPostForm.reset();
+                loadArticles();
+                closeModal('article-view-modal'); // إغلاق نافذة العرض لتحديثها
+            } catch (error) {
+                console.error('Error updating document:', error);
+                alert('حدث خطأ أثناء حفظ التعديلات.');
+            } finally {
+                submitBtn.disabled = false;
+                statusDiv.textContent = '';
+            }
+        });
+        
+        async function loadComments(articleId) {
+            const commentsList = document.getElementById('comments-list');
+            if (!commentsList) return;
+            commentsList.innerHTML = '<div class="spinner"></div>';
+            
+            try {
+                const q = query(collection(db, 'articles', articleId, 'comments'), orderBy("createdAt", "desc"));
+                const snapshot = await getDocs(q);
+                commentsList.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    commentsList.innerHTML = '<li><p>كن أول من يكتب تعليقًا!</p></li>';
+                    return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const comment = docSnap.data();
+                    const li = document.createElement('li');
+                    li.className = 'comment-item';
+                    const deleteButtonHTML = isAdmin ? `<button class="delete-comment-btn" data-comment-id="${docSnap.id}">حذف</button>` : '';
+
+                    li.innerHTML = `
+                        ${deleteButtonHTML}
+                        <div class="comment-meta">
+                            <span class="comment-author">${comment.name}</span>
+                            <span class="comment-date">${formatFirebaseDate(comment.createdAt)}</span>
+                        </div>
+                        <p class="comment-text">${comment.text}</p>
+                    `;
+                    commentsList.appendChild(li);
+                });
+            } catch (error) {
+                console.error("Error loading comments: ", error);
+                commentsList.innerHTML = '<li><p>حدث خطأ في تحميل التعليقات.</p></li>';
+            }
+        }
+        
+        async function handleCommentSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const articleId = form.dataset.articleId;
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+
+            try {
+                await addDoc(collection(db, 'articles', articleId, 'comments'), {
+                    name: form.querySelector('#commenter-name').value,
+                    email: form.querySelector('#commenter-email').value,
+                    text: form.querySelector('#comment-text').value,
+                    createdAt: serverTimestamp()
+                });
+                form.reset();
+                loadComments(articleId);
+            } catch (error) {
+                console.error("Error adding comment: ", error);
+                alert('حدث خطأ في إضافة التعليق.');
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+        
+        async function handleDeleteComment(articleId, commentId) {
+            if (!isAdmin) return;
+            try {
+                await deleteDoc(doc(db, 'articles', articleId, 'comments', commentId));
+                loadComments(articleId);
+            } catch (error) {
+                console.error("Error deleting comment: ", error);
+                alert('حدث خطأ أثناء حذف التعليق.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadArticles);
+    </script>
+</body>
+</html>
