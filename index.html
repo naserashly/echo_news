@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <!-- تم الإصلاح: تغيير type إلى النوع الصحيح لملفات PNG -->
+    
     <link rel="icon" href="https://cdn-icons-png.freepik.com/512/7108/7108096.png" type="image/png">
 
     <meta charset="UTF-8">
@@ -635,6 +635,13 @@
                     const card = document.createElement('div');
                     card.className = 'article-card';
                     card.dataset.id = docSnap.id;
+                    
+                    // --- بداية التعديل المطلوب ---
+                    // نتحقق إذا كان هناك تاريخ تعديل، ونجهز كود HTML لعرضه
+                    const updateMetaHTML = article.updatedAt 
+                        ? `<br><span style="color: var(--success-color);">مُعدّل: ${formatFirebaseDate(article.updatedAt)}</span>` 
+                        : '';
+                    // --- نهاية التعديل المطلوب ---
 
                     card.innerHTML = `
                         <img src="${article.imageUrl || 'https://via.placeholder.com/400x200.png?text=خبر'}" alt="${article.title}" class="article-card-img">
@@ -643,6 +650,7 @@
                         </div>
                         <div class="article-card-meta">
                            <span>بواسطة: ${article.author || 'فريق التحرير'}</span> | <span>${formatFirebaseDate(article.createdAt)}</span>
+                           ${updateMetaHTML} <!-- هنا تم إضافة متغير تاريخ التعديل -->
                         </div>
                     `;
                     card.addEventListener('click', () => viewArticle(docSnap.id));
